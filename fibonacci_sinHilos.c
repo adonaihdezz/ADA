@@ -1,3 +1,5 @@
+
+
 /*
  * ANALISIS Y DISENO DE ALGORITMOS
  *
@@ -5,7 +7,7 @@
  * -------------------
  * EQUIPO: LOS BELICOS
  * 
- * VERSION DE CODIGO: 3.0
+ * VERSION DE CODIGO: 12.0
  * 
  *FECHA: 15/04/2023
  *
@@ -13,6 +15,11 @@
  *
  *
  */
+
+
+//ejecutar en terminal: ./scriptFibonacci1.sh n n1 n2 n3
+//ejemplo: ./scriptFibonacci1.sh 4 10000000 6 20
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "recursos/tiempo.h"
@@ -21,44 +28,81 @@ int min(int x, int y);
 int fibMonaccianSearch(int *a, int x, int n);
 
 
-int main(int arg, char* argv[],int num)
+int main(int arg, char* argv[])
 {
-	long int numeros_a_buscar[] = {322486, 14700764, 3128036, 6337399, 61396, 10393545, 2147445644, 1295390003, 450057883, 187645041, 1980098116, 152503, 5000, 1493283650, 214826, 18433949527, 1360839354, 2109248666, 2147470852, 0};
-    int num_numeros_a_buscar = sizeof(numeros_a_buscar) / sizeof(numeros_a_buscar[0]);
+	int num;
+	int *numeros_a_buscar,*A, *tamano; //Arreglo de numeros a buscar y arreglo de tama�os
 	int i,j,k;
 	double utime0, stime0, wtime0,utime1, stime1, wtime1; //Variables para medici�n de tiempos
 	double utime02, stime02, wtime02,utime12, stime12, wtime12;
-	
-	int *A;
-	int n;
 
-	if(arg != 2)
-	{
-		printf("\n\n Para compilar se necesita tamanio de arreglo");
-		exit(1);
-	}
+	//******************************************************************
+	//variables para leer archivos
+    int n, n2,n3,ind;
+    FILE *fp1, *fp2,*fp3;
+	//******************************************************************
 
+	//leyendo argumentos y generando espacio para los arreglos
 	
-    n= atoi(argv[1]);
+    n = atoi(argv[1]);
     A = (int*) malloc(n * sizeof(int));
-    
-     
-    for (i = 0; i < n; i++) 
-        scanf("%d", &A[i]);
-    
+
+   	n2  = atoi(argv[2]);
+    tamano = (int*) malloc(n2 * sizeof(int));
+
+    n3 = atoi(argv[3]);
+    numeros_a_buscar = (int*) malloc(n3 * sizeof(int));
+
+
+	//abriendo archivos
+
+    fp1 = fopen(argv[4], "r");
+    fp2 = fopen(argv[5], "r");
+	fp3 = fopen(argv[6], "r");
+
+
+	//revisando que los archivos se hayan abierto correctamente
+    if (fp1 == NULL || fp2 == NULL || fp3 == NULL) {
+        printf("Error al abrir los archivos de texto.\n");
+        exit(1);
+    }
+
+	//leyendo los archivos y guardando los datos en los arreglos
+    for (i = 0; i < n; i++) {
+        fscanf(fp1, "%d", &A[i]);
+    }
+
+	for (i = 0; i < n2; i++) {
+        fscanf(fp2, "%d", &tamano[i]);
+    }
+
+    for (i = 0; i < n3; i++) {
+        fscanf(fp3, "%d", &numeros_a_buscar[i]);
+    }
+
+
+    //cerrando archivos
+    fclose(fp1);
+    fclose(fp2);
+	fclose(fp3);
+	//******************************************************************
+
 	printf("\n---------------------Implementacion sin hilos---------------------\n\n");
 
-	printf("\n\npara n: %d\n\n",n);
-
-	for (j = 0; j < num_numeros_a_buscar ;j++) {
+	// en n2 se guardan los tama�os de los arreglos, por eso se usa para el ciclo
+	for( i = 0; i < n2; i++)
+	{
+		printf("\n\npara n: %d\n\n",tamano[i]);
+		//en n3 se guardan los numeros a buscar, por eso se usa para el ciclo
+		for (j = 0; j < n3 ;j++) {
 
 			num= numeros_a_buscar[j];
 
-			printf("Buscando %d\n", num);
+			printf("\n\n-----> Buscando %d\n", num);
 
 
 			uswtime(&utime0, &stime0, &wtime0);
-			int ind = fibMonaccianSearch(A, num, n);
+			ind = fibMonaccianSearch(A, num, n);
 			uswtime(&utime1, &stime1, &wtime1);
 
 			utime02+=utime0;
@@ -76,7 +120,7 @@ int main(int arg, char* argv[],int num)
 			wtime1=0;
 				
 
-			//Imprimir el numero si se encontro o no
+			//Imprimir el numero si se encontro o no, yo no lo imprimo porque llena el archivo de texto de datos
 
 			/*
 			if(ind >= 0)
@@ -85,23 +129,30 @@ int main(int arg, char* argv[],int num)
 				printf("\n\nel numero %d no se encuentra en el arreglo\n\n ",num);
 			*/
 	
-	}
+		}	
 
-	printf("\nTiempo de ejecucion del programa\n");
-	printf("real (Tiempo total):  %.10f s\n",  (wtime12 - wtime02)/20);
-	printf("user (Tiempo de procesamiento en CPU): %.10f s\n",  (utime12 - utime02)/20);
-	printf("sys (Tiempo en acciónes de E/S):  %.10f s\n",  (stime12 - stime02)/20);
-	printf("CPU/Wall:   %.10f %% \n",100.0 * ((utime12 - utime02 + stime12 - stime02) / (wtime12 -wtime02))/20);
-	printf("\n");
+		printf("\n\n");
+
+		printf("\nTiempo de ejecucion del programa\n");
+		printf("real (Tiempo total):  %.10f s\n",  (wtime12 - wtime02)/20);
+		printf("user (Tiempo de procesamiento en CPU): %.10f s\n",  (utime12 - utime02)/20);
+		printf("sys (Tiempo en acciónes de E/S):  %.10f s\n",  (stime12 - stime02)/20);
+		printf("CPU/Wall:   %.10f %% \n",100.0 * ((utime12 - utime02 + stime12 - stime02) / (wtime12 -wtime02))/20);
+		printf("\n");
+		
+		//Mostrar los tiempos en formato exponecial
+		printf("\nFormato exponencial\n");
+		printf("real (Tiempo total):  %.10e s\n",  (wtime12 - wtime02)/20);
+		printf("user (Tiempo de procesamiento en CPU): %.10e s\n",  (utime12 - utime02)/20);
+		printf("sys (Tiempo en acciónes de E/S):  %.10e s\n",  (stime12 - stime02)/20);
+		printf("CPU/Wall:   %.10f %% \n",100.0 * ((utime12 - utime02 + stime12 - stime02) / (wtime12 - wtime02))/20);
+		printf("\n");
+		printf("\n\n**************************************\n\n");
+
+	}
 	
-	//Mostrar los tiempos en formato exponecial
-	printf("\nFormato exponencial\n");
-	printf("real (Tiempo total):  %.10e s\n",  (wtime12 - wtime02)/20);
-	printf("user (Tiempo de procesamiento en CPU): %.10e s\n",  (utime12 - utime02)/20);
-	printf("sys (Tiempo en acciónes de E/S):  %.10e s\n",  (stime12 - stime02)/20);
-	printf("CPU/Wall:   %.10f %% \n",100.0 * ((utime12 - utime02 + stime12 - stime02) / (wtime12 - wtime02))/20);
-	printf("\n");
-	printf("\n\n**************************************\n\n");
+
+
 
 		
 	free(A);
