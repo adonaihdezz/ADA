@@ -27,3 +27,6 @@ output_file="salFibonacci_sinHilos.txt"
 
 # Ejecuta el programa con los parámetros y los archivos de texto
 ./fibonacci_sinHilos "$n2" "$n3" "$n4" numeros.txt tamano.txt numero.txt > "$output_file"
+
+#ejecutar en terminal: ./scriptFibonacci1.sh n n1 n2 n3
+#ejemplo: ./scriptFibonacci1.sh 4 10000000 6 20
