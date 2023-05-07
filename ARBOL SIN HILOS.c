@@ -1,16 +1,16 @@
 /*
- *	AN¡LISIS Y DISE—O DE ALGORITMOS
+ *	AN√ÅLISIS Y DISE√ëO DE ALGORITMOS
  *
- *	PR¡CTICA 02: ImplementaciÛn de la b˙squeda en ABB, utilizando el cÛdigo proporcionado de GeeksForGeeks.
+ *	PR√ÅCTICA 02: Implementaci√≥n de la b√∫squeda en ABB, utilizando el c√≥digo proporcionado de GeeksForGeeks.
  *	https://www.geeksforgeeks.org/binary-search-tree-set-1-search-and-insertion/ 
  * -------------------
- *	EQUIPO: LOS B…LICOS
+ *	EQUIPO: LOS B√âLICOS
  * 
  *	VERSION DE CODIGO: 5.0
  * 
  *	FECHA: 2/05/2023
  *
- *	REALIZ”: MEDINA ZEPEDA SAMANTHA
+ *	REALIZ√ì: MEDINA ZEPEDA SAMANTHA
  *
  *
  */
@@ -18,7 +18,7 @@
 //ejecutar en terminal: ./scriptBABB1.sh n n1 n2 n3
 //ejemplo: ./scriptBABB1.sh 4 10000000 6 20
 
-//DeclaraciÛn de librerÌas
+//Declaraci√≥n de librer√≠as
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
@@ -26,7 +26,7 @@
 
 /*Declramos la estructura del nodo con los siguientes elementos:
 
-	dato, hijo izquierdo y derecho, Ìndice que nos indicar· la posiciÛn del n˙mero.
+	dato, hijo izquierdo y derecho, √≠ndice que nos indicar√° la posici√≥n del n√∫mero.
 */
 typedef struct Nodo 
 {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	
 	if(argc != 2)
 	{
-		printf("\n\n Para ejecutar el programa se necesita tamaÒo de arreglo");
+		printf("\n\n Para ejecutar el programa se necesita tama√±o de arreglo");
 		//printf("\n Ejemplo: %s 100", argv[0]);
 		exit(1);
 	}
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 		printf("\nTiempo de ejecucion del programa\n");
 		printf("real (Tiempo total):  %.10f s\n",  (wtime12 - wtime02)/20);
 		printf("user (Tiempo de procesamiento en CPU): %.10f s\n",  (utime12 - utime02)/20);
-		printf("sys (Tiempo en acciÛnes de E/S):  %.10f s\n",  (stime12 - stime02)/20);
+		printf("sys (Tiempo en acci√≥nes de E/S):  %.10f s\n",  (stime12 - stime02)/20);
 		printf("CPU/Wall:   %.10f %% \n",100.0 * ((utime12 - utime02 + stime12 - stime02) / (wtime12 -wtime02))/20);
 		printf("\n");
 		
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 		printf("\nFormato exponencial\n");
 		printf("real (Tiempo total):  %.10e s\n",  (wtime12 - wtime02)/20);
 		printf("user (Tiempo de procesamiento en CPU): %.10e s\n",  (utime12 - utime02)/20);
-		printf("sys (Tiempo en acciÛnes de E/S):  %.10e s\n",  (stime12 - stime02)/20);
+		printf("sys (Tiempo en acci√≥nes de E/S):  %.10e s\n",  (stime12 - stime02)/20);
 		printf("CPU/Wall:   %.10f %% \n",100.0 * ((utime12 - utime02 + stime12 - stime02) / (wtime12 - wtime02))/20);
 		printf("\n");
 		printf("\n\n**************************************\n\n");
@@ -115,12 +115,12 @@ int main(int argc, char *argv[])
 
 /*	Nodo* NuevoNodo(int item, int indice)
 
-	øQuÈ par·metros recibe? 
-		item : valor que estar· en el nodo
-		indice : posiciÛn de dicho valor en el arreglo
-La funciÛn crea un nodo con el item que le mandamos, reserva la memoria, asigna el item al dato, e inicializa los apuntadores del hijo izquierdo y derecho en NULL
-øQuÈ regresa?
-- El nuevo nodo (su direcciÛn)
+	¬øQu√© par√°metros recibe? 
+		item : valor que estar√° en el nodo
+		indice : posici√≥n de dicho valor en el arreglo
+La funci√≥n crea un nodo con el item que le mandamos, reserva la memoria, asigna el item al dato, e inicializa los apuntadores del hijo izquierdo y derecho en NULL
+¬øQu√© regresa?
+- El nuevo nodo (su direcci√≥n)
 */
 Nodo* NuevoNodo(int item, int indice)
 {
@@ -133,22 +133,22 @@ Nodo* NuevoNodo(int item, int indice)
 
 /*	Nodo* Insertar(Nodo* Nodo, int val, int indice)
 
-	øQuÈ par·metros recibe? 
-		*Nodo : direcciÛn del nodo
-		val : valor que tendr· el nodo
-		indice : su posiciÛn
-La funciÛn inserta elementos en el ·rbol, siguiendo la forma adecuada de hacerlo en la b˙squeda con ABB (que se explica m·s abajo)
-øQuÈ regresa?
-- Hay dos opciones, si el ·rbol estaba vacÌo regresa la direcciÛn del nodo, si no, regresa el apuntador de Nodo
+	¬øQu√© par√°metros recibe? 
+		*Nodo : direcci√≥n del nodo
+		val : valor que tendr√° el nodo
+		indice : su posici√≥n
+La funci√≥n inserta elementos en el √°rbol, siguiendo la forma adecuada de hacerlo en la b√∫squeda con ABB (que se explica m√°s abajo)
+¬øQu√© regresa?
+- Hay dos opciones, si el √°rbol estaba vac√≠o regresa la direcci√≥n del nodo, si no, regresa el apuntador de Nodo
 */
 Nodo* Insertar(Nodo* Nodo, int val, int indice)
 {
-	/* CASO EN EL QUE EL ¡RBOL EST¡ VACÕO */
-	if (Nodo == NULL) // sabe que est· vacÌo porque se cumple que Nodo es igual con NULL
-		return NuevoNodo(val, indice); //Llama a la funciÛn NuevoNodo y lo crea
+	/* CASO EN EL QUE EL √ÅRBOL EST√Å VAC√çO */
+	if (Nodo == NULL) // sabe que est√° vac√≠o porque se cumple que Nodo es igual con NULL
+		return NuevoNodo(val, indice); //Llama a la funci√≥n NuevoNodo y lo crea
 
 	/* CASO EN EL QUE YA HAY ELEMENTOS
-		En una b˙squeda con ABB los elementos menores al dato de la raÌz se insertan en el hijo izquierdo y los mayores se insertan en el hijo derecho
+		En una b√∫squeda con ABB los elementos menores al dato de la ra√≠z se insertan en el hijo izquierdo y los mayores se insertan en el hijo derecho
 	 */
 	if (val < Nodo->dato)
 		Nodo->izq = Insertar(Nodo->izq, val, indice);
@@ -159,16 +159,16 @@ Nodo* Insertar(Nodo* Nodo, int val, int indice)
 
 /*	Nodo* Buscar(Nodo* raiz, int val)
 
-	øQuÈ par·metros recibe? 
-		*raiz : direcciÛn del nodo raiz
+	¬øQu√© par√°metros recibe? 
+		*raiz : direcci√≥n del nodo raiz
 		val : valor que tiene el nodo
-La funciÛn busca elementos en el ·rbol, y lo hace siguiendo la forma de b˙squeda con ABB (como en la funciÛn insertar)
-øQuÈ regresa?
-- Regresa la direcciÛn del nodo raiz
+La funci√≥n busca elementos en el √°rbol, y lo hace siguiendo la forma de b√∫squeda con ABB (como en la funci√≥n insertar)
+¬øQu√© regresa?
+- Regresa la direcci√≥n del nodo raiz
 */
 Nodo* Buscar(Nodo* raiz, int val)
 {
-	// CASO BASE: raiz es igual con NULL o el n˙mero a buscar est· en el nodo raiz
+	// CASO BASE: raiz es igual con NULL o el n√∫mero a buscar est√° en el nodo raiz
 	if (raiz == NULL || raiz->dato == val)
 	return raiz;
 	
@@ -182,11 +182,11 @@ Nodo* Buscar(Nodo* raiz, int val)
 
 /*	void InOrden(Nodo* raiz)
 
-	øQuÈ par·metros recibe? 
-		*raiz : El nodo raiz del arbol (su direcciÛn)
-La funciÛn imprime los valores utilizando Inorden, de tal forma que los elementos se imprimen ordenados
-øQuÈ regresa?
-- En este caso solo nos imprime los valores, la funciÛn en si es de tipo void.
+	¬øQu√© par√°metros recibe? 
+		*raiz : El nodo raiz del arbol (su direcci√≥n)
+La funci√≥n imprime los valores utilizando Inorden, de tal forma que los elementos se imprimen ordenados
+¬øQu√© regresa?
+- En este caso solo nos imprime los valores, la funci√≥n en si es de tipo void.
 */
 void InOrden(Nodo* raiz)
 {
