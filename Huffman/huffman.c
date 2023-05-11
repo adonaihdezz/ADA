@@ -1,7 +1,12 @@
+/*ESTA PEQUEÃ‘A PARTE DEL CODIGO HACE LA LECTURA DEL ARCHIVO Y CON UN BUCLE WHILE
+*DETECTA LOS BYTES QUE TIENE ESTE, DONDE LOS GUARDA EN UN ARREGLO DE CHARS Y CON ESE 
+*MISMO ARREGLO DE CHARS GUARDA EN OTRO ARREGLO LAS FRECUENCIA DE LOS BYTES
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_BYTES 256 // número máximo de bytes diferentes (0-255)
+#define MAX_BYTES 256 // nÃºmero mÃ¡ximo de bytes diferentes (0-255)
 
 int main() {
     char *filename = "archivo.bin"; // nombre del archivo a leer
@@ -20,7 +25,7 @@ int main() {
     // obtener los bytes del archivo y las frecuencias de cada byte
     while ((byte = fgetc(file)) != EOF) {
         size++;
-        bytes = (char *) realloc(bytes, size); // asignar más memoria al arreglo
+        bytes = (char *) realloc(bytes, size); // asignar mÃ¡s memoria al arreglo
         bytes[size - 1] = byte;
         frequencies[(unsigned char) byte]++;
     }
