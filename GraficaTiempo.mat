@@ -1,0 +1,11 @@
+ EN "Y" SE PONEN LOS TIEMPOS
+Y = [3.0517, 4.1961, 5.3405, 7.6239, 9.1552, 4.2207];
+X = [1000000, 2000000, 3000000, 4000000, 5000000, 10000000];
+
+plot(X, Y, 'r-', 'LineWidth', 1.5);
+grid on;
+
+%PUS AQUI UNO PONE SU TITULO
+title('Fibonacci');
+xlabel('n');
+ylabel('tiempo');
