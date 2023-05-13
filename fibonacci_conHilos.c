@@ -5,9 +5,9 @@
  * -------------------
  * EQUIPO: LOS BELICOS
  * 
- * VERSION DE CODIGO: 14.0
+ * VERSION DE CODIGO: 16.0
  * 
- *FECHA: 15/04/2023
+ *FECHA: 12/05/2023
  *
  *REALIZO: TORRES GUZMAN CESAR HAVIT
  *
@@ -24,12 +24,11 @@
 #include <pthread.h>
 
 int NumThreads;			//N�mero de threads
-int N,*A,num,n,ind=0;
+int N,*A,num,n,ind;
 
-
+void fibMonaccianSearch(int *a, int inicio, int fin, int num);
 void* saludar(void* id);
 int min(int x, int y);
-int fibMonaccianSearch(int *a, int x, int n);
 void* procesar(void* id);
 
 
@@ -56,6 +55,8 @@ int main(int arg, char* argv[])
 	
 	NumThreads=atoi(argv[1]);
 	thread = malloc(NumThreads*sizeof(pthread_t));
+
+	ind=-1;
     
 	if(arg != 3)
 	{
@@ -113,12 +114,12 @@ int main(int arg, char* argv[])
 	for (j = 0; j < num_numeros_a_buscar ;j++) {
 
 			num= numeros_a_buscar[j];
-
+			ind=-1;
 			printf("\n\n------> Buscando %d\n", num);
 
+			uswtime(&utime0, &stime0, &wtime0);
 
-			for (int k = 1; k < NumThreads; k++) 
-			{
+			for (int k = 1; k < NumThreads; k++) {
 				if (pthread_create(&thread[k], NULL, procesar, (void*)k) != 0 ) 
 				{
 					perror("El thread no pudo crearse");
@@ -126,9 +127,21 @@ int main(int arg, char* argv[])
 				}
 			}
 
-			uswtime(&utime0, &stime0, &wtime0);
 			procesar(0);
+
+				
+			//Esperar a que terminen los threads (Saludar)
+			for (int k = 1; k < NumThreads; k++) pthread_join(thread[k], NULL);
+
+			//Imprimir el numero si se encontro o no
+
 			uswtime(&utime1, &stime1, &wtime1);
+
+			if(ind != -1 )
+				printf("\n\nnumero encontrado en el lugar: %d\n\n",ind);
+			else
+				printf("\n\nel numero %d no se encuentra en el arreglo\n\n ",num);
+
 
 			utime02+=utime0;
 			stime02+=stime0;
@@ -143,20 +156,9 @@ int main(int arg, char* argv[])
 			utime1=0;
 			stime1=0;
 			wtime1=0;
-				
-			//Esperar a que terminen los threads (Saludar)
-			for (int k = 1; k < NumThreads; k++) pthread_join(thread[k], NULL);
-
-			//Imprimir el numero si se encontro o no
-
-			/*
-			if(ind >= 0)
-				printf("\n\nnumero encontrado en el lugar: %d\n\n",ind);
-			else
-				printf("\n\nel numero %d no se encuentra en el arreglo\n\n ",num);
-			*/
 	
 	}
+	
 
 
 	//***************************************************************************************************************************
@@ -206,8 +208,12 @@ PARAMETRO n: Tama�o del arreglo.
 */
 
 /* Returns index of x if present, else returns -1 */
-int fibMonaccianSearch(int *a, int x, int n)
+void fibMonaccianSearch(int *a, int inicio,int fin, int n)
 {
+	if (ind!=-1)
+		return;
+
+	
 	/* Initialize fibonacci numbers */
 	int fibMMm2 = 0; // (m-2)'th Fibonacci No.
 	int fibMMm1 = 1; // (m-1)'th Fibonacci No.
@@ -215,7 +221,7 @@ int fibMonaccianSearch(int *a, int x, int n)
 
 	/* fibM is going to store the smallest Fibonacci
 	Number greater than or equal to n */
-	while (fibM < n) {
+	while (ind == -1 && fibM < fin-inicio) {
 		fibMMm2 = fibMMm1;
 		fibMMm1 = fibM;
 		fibM = fibMMm2 + fibMMm1;
@@ -227,13 +233,13 @@ int fibMonaccianSearch(int *a, int x, int n)
 	/* while there are elements to be inspected. Note that
 	we compare arr[fibMm2] with x. When fibM becomes 1,
 	fibMm2 becomes 0 */
-	while (fibM > 1) {
+	while (ind ==-1 && fibM > 1) {
 		// Check if fibMm2 is a valid location
-		int i = min(offset + fibMMm2, n - 1);
+		int i = min(offset + fibMMm2, fin - inicio - 1);
 
 		/* If x is greater than the value at index fibMm2,
 		cut the subarray array from offset to i */
-		if (a[i] < x) {
+		if (a[i+inicio] < num) {
 			fibM = fibMMm1;
 			fibMMm1 = fibMMm2;
 			fibMMm2 = fibM - fibMMm1;
@@ -242,7 +248,7 @@ int fibMonaccianSearch(int *a, int x, int n)
 
 		/* If x is greater than the value at index fibMm2,
 		cut the subarray after i+1 */
-		else if (a[i] > x) {
+		else if (a[i+inicio] > num) {
 			fibM = fibMMm2;
 			fibMMm1 = fibMMm1 - fibMMm2;
 			fibMMm2 = fibM - fibMMm1;
@@ -250,15 +256,17 @@ int fibMonaccianSearch(int *a, int x, int n)
 
 		/* element found. return index */
 		else
-			return i;
+			ind=i+inicio;
+
 	}
 
 	/* comparing the last element with x */
-	if (fibMMm1 && a[offset + 1] == x)
-		return offset + 1;
+	if (ind==-1 && fibMMm1 && a[offset + inicio + 1] == num){
 
-	/*element not found. return -1 */
-	return -1;
+		ind = offset + offset + 1;
+		printf("\n\nel numero se encuentra en la posicion ½d\n\n ",inicio);
+	}
+
 }
 
 
@@ -266,8 +274,7 @@ int fibMonaccianSearch(int *a, int x, int n)
 DESCRIPCION:La funcion procesar es la funcion que ejecutan los threads.
 PARAMETRO id: Identificador del thread.
 */
-void* procesar(void* id)
-{	
+void* procesar(void* id){	
 	int n_thread=(int)id;
 	int inicio,fin,i;
 
@@ -279,11 +286,11 @@ void* procesar(void* id)
 		fin=((n_thread+1)*n)/NumThreads-1;
 	
 
-	printf("\nHola desde procesar\tSoy el thread %d\tInicio %d\tTermino %d",n_thread,inicio,fin);
+	//printf("\nHola desde procesar\tSoy el thread %d\tInicio %d\tTermino %d",n_thread,inicio,fin);
 	
-	ind = fibMonaccianSearch(A, num, n);
+	fibMonaccianSearch(A, inicio,fin, num);
 
-	printf("\nBye desde procesar\tSoy el thread %d\tHe terminado",n_thread);
+	//printf("\nBye desde procesar\tSoy el thread %d\tHe terminado",n_thread);
 
 }
 
