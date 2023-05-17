@@ -1,13 +1,13 @@
 /*
  * ANALISIS Y DISENO DE ALGORITMOS
  *
- *ALGORITMO HEAPSORT DE LA PRACTICA 1: IMPLEMENTACION Y ANALISIS DE EJECUCION DEL ALGORITMO FUBONACCI.
+ *PRACTICA 2: IMPLEMENTACION Y ANALISIS DE EJECUCION DEL ALGORITMO FIBONACCI.
  * -------------------
  * EQUIPO: LOS BELICOS
  * 
- * VERSION DE CODIGO: 16.0
+ * VERSION DE CODIGO: 19.0
  * 
- *FECHA: 12/05/2023
+ *FECHA: 15/04/2023
  *
  *REALIZO: TORRES GUZMAN CESAR HAVIT
  *
@@ -201,44 +201,48 @@ int min(int x, int y)
 
 
 /*
-DESCRIPCION:La funcion fibMonaccianSearch es una busqueda de fibonacci.
-PARAMETRO a: Arreglo donde se va a buscar.
-PARAMETRO x: Numero a buscar.
-PARAMETRO n: Tama�o del arreglo.
+DESCRIPCION:
+	La funcion fibMonaccianSearch es una busqueda aplicando la sucesion de fibonacci, donde se compara el numero a buscar 
+	con el A[i] y se mueve el inicio y fin de la busqueda dependiendo del resultado de la comparacion.
+
+ENTRADA:
+	*a: Arreglo donde se va a buscar el numero.
+	inicio: Posicion inicial del arreglo.
+	fin: Posicion final del arreglo.
+	n: Numero a buscar.
+
+RETORNO: No retorna nada.
 */
 
-/* Returns index of x if present, else returns -1 */
 void fibMonaccianSearch(int *a, int inicio,int fin, int n)
 {
 	if (ind!=-1)
 		return;
 
 	
-	/* Initialize fibonacci numbers */
+	// Inicializar los numeros de fibonacci
 	int fibMMm2 = 0; // (m-2)'th Fibonacci No.
 	int fibMMm1 = 1; // (m-1)'th Fibonacci No.
 	int fibM = fibMMm2 + fibMMm1; // m'th Fibonacci
 
-	/* fibM is going to store the smallest Fibonacci
-	Number greater than or equal to n */
+	//fibM es el numero de fibonacci mas peque�o mayor o igual a n
 	while (ind == -1 && fibM < fin-inicio) {
 		fibMMm2 = fibMMm1;
 		fibMMm1 = fibM;
 		fibM = fibMMm2 + fibMMm1;
 	}
 
-	// Marks the eliminated range from front
+	// marcamos el rango eliminado desde el frente
 	int offset = -1;
 
-	/* while there are elements to be inspected. Note that
-	we compare arr[fibMm2] with x. When fibM becomes 1,
-	fibMm2 becomes 0 */
+	//mientras que haya elementos para inspeccionar, fibMm2 se compara con x. Cuando fibM se vuelve 1, fibMm2 se vuelve 0 y se termina el ciclo. 
 	while (ind ==-1 && fibM > 1) {
-		// Check if fibMm2 is a valid location
+
+		//chequeamos si fibMm2 es una posicion valida
 		int i = min(offset + fibMMm2, fin - inicio - 1);
 
-		/* If x is greater than the value at index fibMm2,
-		cut the subarray array from offset to i */
+
+		//si x es mayor que el valor en la posicion fibMm2, cortamos el subarreglo desde offset hasta i
 		if (a[i+inicio] < num) {
 			fibM = fibMMm1;
 			fibMMm1 = fibMMm2;
@@ -246,21 +250,21 @@ void fibMonaccianSearch(int *a, int inicio,int fin, int n)
 			offset = i;
 		}
 
-		/* If x is greater than the value at index fibMm2,
-		cut the subarray after i+1 */
+		//si x es mayor que el valor en la posicion fibMm2, cortamos el subarreglo despues de i+1
 		else if (a[i+inicio] > num) {
 			fibM = fibMMm2;
 			fibMMm1 = fibMMm1 - fibMMm2;
 			fibMMm2 = fibM - fibMMm1;
 		}
 
-		/* element found. return index */
+		//elemento encontrado, y asignamos el indice
 		else
 			ind=i+inicio;
 
 	}
 
-	/* comparing the last element with x */
+	//comparamos el ultimo elemento con num
+
 	if (ind==-1 && fibMMm1 && a[offset + inicio + 1] == num){
 
 		ind = offset + offset + 1;
