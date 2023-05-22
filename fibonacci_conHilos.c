@@ -1,11 +1,11 @@
 /*
  * ANALISIS Y DISENO DE ALGORITMOS
  *
- *PRACTICA 2: IMPLEMENTACION Y ANALISIS DE EJECUCION DEL ALGORITMO FIBONACCI.
+ *ALGORITMO HEAPSORT DE LA PRACTICA 1: IMPLEMENTACION Y ANALISIS DE EJECUCION DEL ALGORITMO FUBONACCI.
  * -------------------
  * EQUIPO: LOS BELICOS
  * 
- * VERSION DE CODIGO: 19.0
+ * VERSION DE CODIGO: 14.0
  * 
  *FECHA: 15/04/2023
  *
@@ -24,12 +24,13 @@
 #include <pthread.h>
 
 int NumThreads;			//N�mero de threads
-int N,*A,num,n,ind;
+int *A,n,ind;
+long int num;
 
-void fibMonaccianSearch(int *a, int inicio, int fin, int num);
+void* procesar(void* id);
+void fibMonaccianSearch(int *a, int inicio, int fin,long int num);
 void* saludar(void* id);
 int min(int x, int y);
-void* procesar(void* id);
 
 
 int main(int arg, char* argv[])
@@ -75,35 +76,6 @@ int main(int arg, char* argv[])
 	printf("\n--------------------------Implementacion con hilos----------------------------- \n\n");
 //***************************************************************************************************************************
 
-    
-//***************************************************************************************************************************
-// Saludar desde cada hilo "saludar"
-//***************************************************************************************************************************
-	//Crear los threads con el comportamiento "segmentar"
-	for (i=1; i<NumThreads; i++) 
-	{
-		if (pthread_create (&thread[i], NULL, saludar,(void*)i) != 0 ) 
-		{
-			perror("El thread no  pudo crearse");
-			exit(-1);
-		}
-	}
-	
-	//El main ejecuta el thread 0
-	saludar(0);
-	
-	
-	//Esperar a que terminen los threads (Saludar)
-	for (i=1; i<NumThreads; i++) pthread_join (thread[i], NULL);
-				
-	
-	printf("\n");
-				
-	//***************************************************************************************************************************
-	//2 Procesar desde cada hilo "procesar"
-	//***************************************************************************************************************************
-	
-
 //***************************************************************************************************************************
 // Buscar cada n�mero en el arreglo
 //***************************************************************************************************************************
@@ -115,11 +87,11 @@ int main(int arg, char* argv[])
 
 			num= numeros_a_buscar[j];
 			ind=-1;
-			printf("\n\n------> Buscando %d\n", num);
+			printf("\n\n------> Buscando %ld\n", num);
 
 			uswtime(&utime0, &stime0, &wtime0);
 
-			for (int k = 1; k < NumThreads; k++) {
+			for (k = 1; k < NumThreads; k++) {
 				if (pthread_create(&thread[k], NULL, procesar, (void*)k) != 0 ) 
 				{
 					perror("El thread no pudo crearse");
@@ -131,7 +103,8 @@ int main(int arg, char* argv[])
 
 				
 			//Esperar a que terminen los threads (Saludar)
-			for (int k = 1; k < NumThreads; k++) pthread_join(thread[k], NULL);
+			for (k = 1; k < NumThreads; k++) 
+				pthread_join(thread[k], NULL);
 
 			//Imprimir el numero si se encontro o no
 
@@ -140,7 +113,7 @@ int main(int arg, char* argv[])
 			if(ind != -1 )
 				printf("\n\nnumero encontrado en el lugar: %d\n\n",ind);
 			else
-				printf("\n\nel numero %d no se encuentra en el arreglo\n\n ",num);
+				printf("\n\nel numero %ld no se encuentra en el arreglo\n\n ",num);
 
 
 			utime02+=utime0;
@@ -204,6 +177,8 @@ int min(int x, int y)
 DESCRIPCION:
 	La funcion fibMonaccianSearch es una busqueda aplicando la sucesion de fibonacci, donde se compara el numero a buscar 
 	con el A[i] y se mueve el inicio y fin de la busqueda dependiendo del resultado de la comparacion.
+	en esta version se utiliza hilos para realizar la busqueda, donde cada hilo se encarga de una parte del arreglo.
+	de forma que para obtener el indice del numero buscado se compara el inicio y fin de cada hilo con el numero buscado.
 
 ENTRADA:
 	*a: Arreglo donde se va a buscar el numero.
@@ -214,7 +189,7 @@ ENTRADA:
 RETORNO: No retorna nada.
 */
 
-void fibMonaccianSearch(int *a, int inicio,int fin, int n)
+void fibMonaccianSearch(int *a, int inicio,int fin, long int num)
 {
 	if (ind!=-1)
 		return;
@@ -267,8 +242,8 @@ void fibMonaccianSearch(int *a, int inicio,int fin, int n)
 
 	if (ind==-1 && fibMMm1 && a[offset + inicio + 1] == num){
 
-		ind = offset + offset + 1;
-		printf("\n\nel numero se encuentra en la posicion ½d\n\n ",inicio);
+		ind = offset + inicio + 1;
+		printf("\n\nel numero se encuentra en la posicion %d\n\n ",inicio);
 	}
 
 }
@@ -276,6 +251,8 @@ void fibMonaccianSearch(int *a, int inicio,int fin, int n)
 
 /*
 DESCRIPCION:La funcion procesar es la funcion que ejecutan los threads.
+			es la funcion que define el inicio y fin de la busqueda para cada thread.
+			dependiendo del numero de threads que se definan, se divide el arreglo en partes iguales.
 PARAMETRO id: Identificador del thread.
 */
 void* procesar(void* id){	
@@ -287,7 +264,7 @@ void* procesar(void* id){
 	if(n_thread==NumThreads-1)	
 		fin=n;
 	else
-		fin=((n_thread+1)*n)/NumThreads-1;
+		fin=(((n_thread+1)*n)/NumThreads)-1;	
 	
 
 	//printf("\nHola desde procesar\tSoy el thread %d\tInicio %d\tTermino %d",n_thread,inicio,fin);
@@ -298,12 +275,3 @@ void* procesar(void* id){
 
 }
 
-/*
-DESCRIPCION:La funcion saludar es la funcion que ejecutan los threads.
-PARAMETRO id: Identificador del thread.
-*/
-
-void* saludar(void* id)
-{
-	printf("\nHola desde Saludar\tSoy el thread %d", (int)id);
-}
