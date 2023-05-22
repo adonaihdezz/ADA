@@ -1,3 +1,5 @@
+
+
 /*
  * ANALISIS Y DISENO DE ALGORITMOS
  *
@@ -5,7 +7,7 @@
  * -------------------
  * EQUIPO: LOS BELICOS
  * 
- * VERSION DE CODIGO: 13.0
+ * VERSION DE CODIGO: 12.0
  * 
  *FECHA: 15/04/2023
  *
@@ -22,17 +24,18 @@
 #include <stdlib.h>
 #include "recursos/tiempo.h"
 
+//prototipos de funciones
 int min(int x, int y);
 int fibMonaccianSearch(int *a, int x, int n);
 
-
+//funcion principal
 int main(int arg, char* argv[])
 {
-	int num;
+	int num;//numero a buscar
 	int *numeros_a_buscar,*A, *tamano; //Arreglo de numeros a buscar y arreglo de tama�os
-	int i,j,k;
+	int i,j,k;//variables para loops
 	double utime0, stime0, wtime0,utime1, stime1, wtime1; //Variables para medici�n de tiempos
-	double utime02, stime02, wtime02,utime12, stime12, wtime12;
+	double utime02, stime02, wtime02,utime12, stime12, wtime12;//Variables para medici�n de tiempos
 
 	//******************************************************************
 	//variables para leer archivos
@@ -42,13 +45,13 @@ int main(int arg, char* argv[])
 
 	//leyendo argumentos y generando espacio para los arreglos
 	
-    n = atoi(argv[1]);
+    n = atoi(argv[1]);//tama�o total del arreglo
     A = (int*) malloc(n * sizeof(int));
 
-   	n2  = atoi(argv[2]);
+   	n2  = atoi(argv[2]);//tama�o del arreglo de tama�os
     tamano = (int*) malloc(n2 * sizeof(int));
 
-    n3 = atoi(argv[3]);
+    n3 = atoi(argv[3]);//tama�o del arreglo de numeros a buscar
     numeros_a_buscar = (int*) malloc(n3 * sizeof(int));
 
 
@@ -100,7 +103,7 @@ int main(int arg, char* argv[])
 
 
 			uswtime(&utime0, &stime0, &wtime0);
-			ind = fibMonaccianSearch(A, num, n);
+			ind = fibMonaccianSearch(A, num, tamano[i]);
 			uswtime(&utime1, &stime1, &wtime1);
 
 			utime02+=utime0;
@@ -120,12 +123,12 @@ int main(int arg, char* argv[])
 
 			//Imprimir el numero si se encontro o no, yo no lo imprimo porque llena el archivo de texto de datos
 
-			/*
+			
 			if(ind >= 0)
 				printf("\n\nnumero encontrado en el lugar: %d\n\n",ind);
 			else
 				printf("\n\nel numero %d no se encuentra en el arreglo\n\n ",num);
-			*/
+			
 	
 		}	
 
@@ -175,7 +178,9 @@ int min(int x, int y)
 /*
 DESCRIPCION:
 	La funcion fibMonaccianSearch es una busqueda aplicando la sucesion de fibonacci, donde se compara el numero a buscar 
-	con el A[i] y se mueve el inicio y fin de la busqueda dependiendo del resultado de la comparacion.
+	con el A[i] y se mueve el inicio y fin de la busqueda dependiendo del resultado de la comparacion. En esta busqueda
+	se divide el arreglo en segmentos de tama�o fibonacci, y se compara el numero a buscar con el segmento del arreglo que
+	no fue descartado.
 
 ENTRADA:
 	*a: Arreglo donde se va a buscar el numero.
