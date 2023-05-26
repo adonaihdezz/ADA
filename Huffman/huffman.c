@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "recursos/tiempo.h"
 
 #define MAX_BYTES 256 // número máximo de bytes diferentes (0-255)
 
@@ -12,23 +13,11 @@ typedef struct NodoHuffman {
     struct NodoHuffman *derecho; // puntero al nodo hijo derecho
 }nodo;
 
-
-typedef struct {
-    unsigned char byte;
-    int frecuencia;
-} frecuencia_byte;
-
-
-typedef struct {
-    int tamano;
-    frecuencia_byte *tabla;
-} tabla_frecuencia;
-
-
 void descomprimir(FILE *archivo_comprimido, FILE *archivo_descomprimido);
 void guardar_codigos(nodo *raiz, char *codigo, char **codigos);
 void ordenar_nodos(nodo **nodos, int tamano);
 nodo *crear_arbol_huffman(nodo **nodos, int tamano);
+void medirtiempo(double u0, double s0, double w0, double u1, double s1, double w1);
 
 int main(int argc, char *argv[]) {
     // Verificar que se ha proporcionado el nombre del archivo
@@ -44,12 +33,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    //char byte;
+    double utime0, stime0, wtime0,utime1, stime1, wtime1; //Variables para medición de tiempos
     long size = 0;
     char *bytes = NULL;
     int frecuencias[MAX_BYTES] = {0}; // arreglo para almacenar las frecuencias de cada byte
-    char *codigos[MAX_BYTES] = {0};
-    FILE *salida = fopen("archivo_comprimido.dat", "wb");
+    char *codigos[MAX_BYTES] = {0}; //almacenar codigos de huffman
 
     // obtener los bytes del archivo y las frecuencias de cada byte
 
@@ -90,6 +78,7 @@ int main(int argc, char *argv[]) {
     }
 
     int tamNodos = 0;
+
     for (int i = 0; i < MAX_BYTES; i++) {
         if (frecuencias[i] > 0) {
             tamNodos++;
@@ -98,17 +87,19 @@ int main(int argc, char *argv[]) {
 
     fclose(archivo); // cerrar el archivo
 
-    FILE *freq_archivo = fopen("frecuencias.txt", "w"); // abrir el archivo para escribir las frecuencias
+    // funcion de Crear un archivo para escribir las frecuencias
+    
 
+    FILE *freq_archivo = fopen("frecuencias.txt", "w"); // abrir el archivo para escribir las frecuencias
     // escribir las frecuencias en el archivo
     for (int i = 0; i < MAX_BYTES; i++) {
         if (frecuencias[i] != 0) {
             fprintf(freq_archivo, "%02X %d\n", i, frecuencias[i]);
         }
     }
-        
     fclose(freq_archivo); // cerrar el archivo de frecuencias
-    
+
+
     // crear un arreglo de nodos para cada byte en el archivo
     nodo *nodos[tamNodos];
     int contador = 0; // contador para llenar el arreglo de nodos
@@ -125,8 +116,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    uswtime(&utime0, &stime0, &wtime0);
+
     // Crear el árbol de Huffman
     nodo *arbolote = crear_arbol_huffman(nodos, tamNodos);
+
 
 
     // Generar los códigos para cada byte
@@ -134,7 +128,6 @@ int main(int argc, char *argv[]) {
     guardar_codigos(arbolote, codigo, codigos);
 
 
-   //tabla_frecuencia *tabla = generar_tabla_frecuencia(archivo);
 
     // imprimir los códigos de Huffman para cada byte
     for (int i = 0; i < MAX_BYTES; i++) {
@@ -143,22 +136,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    FILE *salida = fopen("archivo_comprimido.dat", "wb");
+
+
     // Escribir el archivo comprimido en el archivo de salida (archivo_comprimido.dat) pero que este archivo sea binario
 
-    // Escribir el tamaño del archivo original  
-    fwrite(&tamaño, sizeof(long), 1, salida);
-
-    // Escribir la tabla de frecuencias
-    for (int i = 0; i < MAX_BYTES; i++) {
-        if (frecuencias[i] != 0) {
-            fwrite(&i, sizeof(char), 1, salida);
-            fwrite(&frecuencias[i], sizeof(int), 1, salida);
-        }
-    }
-
-
-
-    // Escribir el archivo comprimido
+    // Escribir el tamaño del archivo original
     char buffer = 0;
     int contador_bits = 0;
     for (int i = 0; i < tamaño; i++) {
@@ -181,20 +164,52 @@ int main(int argc, char *argv[]) {
         fwrite(&buffer, sizeof(char), 1, salida);
     }
 
+    
+
+    uswtime(&utime1, &stime1, &wtime1);
+
+
+    //funcion para medir el tiempo de ejecucion
+    medirtiempo(utime0, stime0, wtime0, utime1, stime1, wtime1);
+
+
     //crear el archivo descomprimido
-   FILE *archivo_descomprimido = fopen("archivo_descomprimido.txt", "w");
+   //FILE *archivo_descomprimido = fopen("archivo_descomprimido.txt", "w");
     //llamada a la funcion de descomprimir
-    descomprimir(salida, archivo_descomprimido);
     
 
     fclose(salida); // cerrar el archivo de salida
-    free(bytes); // liberar la memoria asignada para el arreglo
+    free(bytes); // liberar la memoria asignada para el arregloss
+    free(arbolote); // liberar la memoria asignada para el árbol
+    
+
 
     return 0;
 }
 
 
-//descomprimir el archivo comprimido con el archivo comprimido
+//funcion para medir el tiempo de ejecucion
+void medirtiempo(double u0, double s0, double w0, double u1, double s1, double w1){
+    printf("\n");
+	printf("real (Tiempo total)  %.10f s\n",  w1 - w0);
+	printf("user (Tiempo de procesamiento en CPU) %.10f s\n",  u1 - u0);
+	printf("sys (Tiempo en acciones de E/S)  %.10f s\n",  s1 - s0);
+	printf("CPU/Wall   %.10f %% \n",100.0 * (u1 - u0 + s1 - s0) / (w1 - w0));
+	printf("\n");
+	
+	// Mostrar los tiempos en formato exponecial
+	printf("\n");
+	printf("real (Tiempo total)  %.10e s\n",  w1 - w0);
+	printf("user (Tiempo de procesamiento en CPU) %.10e s\n",  u1 - u0);
+	printf("sys (Tiempo en acciones de E/S)  %.10e s\n",  s1 - s0);
+	printf("CPU/Wall   %.10f %% \n",100.0 * (u1 - u0 + s1 - s0) / (w1 - w0));
+	printf("\n");
+
+
+}
+
+
+//descomprimir el archivo comprimido con el archivo comprimido ->no funciona
 void descomprimir(FILE *archivo_comprimido, FILE *archivo_descomprimido){
     long tam_original;
     fread(&tam_original, sizeof(long), 1, archivo_comprimido);
@@ -265,7 +280,16 @@ void descomprimir(FILE *archivo_comprimido, FILE *archivo_descomprimido){
 
 }
 
+/*
+DESCRIPCIÓN: 
+    Ordena los nodos por frecuencia de menor a mayor, utilizando el algoritmo de ordenamiento burbuja
 
+PARÁMETROS:
+    nodo **nodos: arreglo de nodos a ordenar
+    int tamano: tamaño del arreglo de nodos
+
+salida: void
+*/
 
 // Ordena los nodos por frecuencia de menor a mayor
 void ordenar_nodos(nodo **nodos, int tamano){
@@ -279,8 +303,26 @@ void ordenar_nodos(nodo **nodos, int tamano){
         }
     }
 }
-// Crear un árbol de Huffman a partir de los nodos
-// Crear un árbol de Huffman a partir de los nodos
+
+
+
+/*
+DESCRIPCIÓN: 
+    Crea el árbol de Huffman a partir de un arreglo de nodos, donde cada hoja es un byte y su frecuencia
+    se ordenan los nodos de menor a mayor frecuencia, y se van uniendo los nodos de menor frecuencia
+    hasta que solo quede un nodo que será la raíz del árbol.
+
+PARÁMETROS:
+    nodo **nodos: arreglo de nodos
+    int tamano: tamaño del arreglo de nodos
+
+
+RETORNO:
+    nodo *: raíz del árbol de Huffman
+
+*/
+
+
 nodo *crear_arbol_huffman(nodo **nodos, int tamano) {
     // Ordenar los nodos por frecuencia de menor a mayor
     ordenar_nodos(nodos, tamano);
@@ -313,7 +355,24 @@ nodo *crear_arbol_huffman(nodo **nodos, int tamano) {
     return nodos[0];
 }
 
+
+
+
 //Guardar los códigos de Huffman en un arreglo de bits
+
+/*
+DESCRIPCION: 
+    hace un recorrido en el árbol de Huffman en preorden para guardar los códigos de Huffman en un arreglo de bits
+    utilizando recursividad, si el nodo es una hoja, se guarda el código en el arreglo de bits
+
+ENTRADA:
+    raiz: nodo raíz del árbol de Huffman
+    codigo: el código actual
+    codigos: arreglo de bits para cada byte
+
+SALIDA:
+    ninguno
+*/
 void guardar_codigos(nodo *raiz, char *codigo, char **codigos) {
     if (raiz != NULL) {
         if (raiz->izquierdo == NULL && raiz->derecho == NULL) {
@@ -333,75 +392,3 @@ void guardar_codigos(nodo *raiz, char *codigo, char **codigos) {
         }
     }
 }
-/*
-// Imprime el árbol de Huffman en preorden
-void imprimir_arbol_huffman(nodo *raiz, char *codigo) {
-    if (raiz != NULL) {
-        if (raiz->izquierdo == NULL && raiz->derecho == NULL) {
-            printf("%c: %s\n", raiz->byte, codigo);
-        }
-        else {
-            char codigo_izq[strlen(codigo) + 2];
-            strcpy(codigo_izq, codigo);
-            strcat(codigo_izq, "0");
-            imprimir_arbol_huffman(raiz->izquierdo, codigo_izq);
-
-            char codigo_der[strlen(codigo) + 2];
-            strcpy(codigo_der, codigo);
-            strcat(codigo_der, "1");
-            imprimir_arbol_huffman(raiz->derecho, codigo_der);
-        }
-    }
-}
-
-*/
-
-
-// Genera una tabla de frecuencias a partir de un archivo
-//******************************************************************************
-/*tabla_frecuencia *generar_tabla_frecuencia(char *nombre_archivo) {
-    FILE *archivo;
-    unsigned char byte;
-    tabla_frecuencia *tabla;
-    frecuencia_byte *tabla_bytes;
-    int tamano_tabla = 0, i, j, encontrado;
-
-    archivo = fopen(nombre_archivo, "rb");
-
-    if (archivo == NULL) {
-        printf("Error al abrir el archivo.\n");
-        return NULL;
-    }
-
-    tabla_bytes = (frecuencia_byte *) malloc(sizeof(frecuencia_byte));
-    tamano_tabla++;
-
-    while (fread(&byte, sizeof(unsigned char), 1, archivo)) {
-        encontrado = 0;
-
-        for (i = 0; i < tamano_tabla; i++) {
-            if (tabla_bytes[i].byte == byte) {
-                tabla_bytes[i].frecuencia++;
-                encontrado = 1;
-                break;
-            }
-        }
-
-        if (!encontrado) {
-            tabla_bytes = (frecuencia_byte *) realloc(tabla_bytes, (tamano_tabla + 1) * sizeof(frecuencia_byte));
-            tabla_bytes[tamano_tabla].byte = byte;
-            tabla_bytes[tamano_tabla].frecuencia = 1;
-            tamano_tabla++;
-        }
-    }
-
-    tabla = (tabla_frecuencia *) malloc(sizeof(tabla_frecuencia));
-    tabla->tamano = tamano_tabla;
-    tabla->tabla = tabla_bytes;
-
-    fclose(archivo);
-
-    return tabla;
-}
-
-*/
